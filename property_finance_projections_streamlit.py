@@ -41,58 +41,45 @@ def maincontent():
         
         with col1:
             # Option to input home price and down payment or direct loan amount
-            calc_method = st.radio("Calculation Method", ["Home Price + Down Payment", "Loan Amount Directly"])
+            home_price = st.number_input(
+                "Home Price ($)",
+                min_value=1000,
+                max_value=100000000,
+                value=500000,
+                step=10000,
+                format="%d"
+            )
             
-            if calc_method == "Home Price + Down Payment":
-                home_price = st.number_input(
-                    "Home Price ($)",
-                    min_value=1000,
-                    max_value=100000000,
-                    value=500000,
-                    step=10000,
+            down_payment_type = st.radio("Down Payment Type", ["Percentage", "Amount"])
+            
+            if down_payment_type == "Percentage":
+                down_payment_percent = st.number_input(
+                    "Down Payment (%)",
+                    min_value=0.0,
+                    max_value=100.0,
+                    value=20.0,
+                    step=1.0,
+                    format="%.1f"
+                )
+                down_payment = home_price * (down_payment_percent / 100)
+                st.write(f"Down Payment Amount: ${down_payment:,.2f}")
+            else:
+                down_payment = st.number_input(
+                    "Down Payment Amount ($)",
+                    min_value=0,
+                    max_value=int(home_price),
+                    value=int(home_price * 0.2),
+                    step=5000,
                     format="%d"
                 )
-                
-                down_payment_type = st.radio("Down Payment Type", ["Percentage", "Amount"])
-                
-                if down_payment_type == "Percentage":
-                    down_payment_percent = st.number_input(
-                        "Down Payment (%)",
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=20.0,
-                        step=1.0,
-                        format="%.1f"
-                    )
-                    down_payment = home_price * (down_payment_percent / 100)
-                    st.write(f"Down Payment Amount: ${down_payment:,.2f}")
-                else:
-                    down_payment = st.number_input(
-                        "Down Payment Amount ($)",
-                        min_value=0,
-                        max_value=int(home_price),
-                        value=int(home_price * 0.2),
-                        step=5000,
-                        format="%d"
-                    )
-                    down_payment_percent = (down_payment / home_price) * 100 if home_price > 0 else 0
-                    st.write(f"Down Payment Percentage: {down_payment_percent:.1f}%")
-                
-                loan_amount = home_price - down_payment
-                st.write(f"Loan Amount: ${loan_amount:,.2f}")
-                
-            else:  # Loan Amount Directly
-                loan_amount = st.number_input(
-                    "Loan Amount ($)",
-                    min_value=1000,
-                    max_value=10000000,
-                    value=300000,
-                    step=10000,
-                    format="%d"
-                )
-                home_price = None
-                down_payment = None
+                down_payment_percent = (down_payment / home_price) * 100 if home_price > 0 else 0
+                st.write(f"Down Payment Percentage: {down_payment_percent:.1f}%")
             
+            loan_amount = home_price - down_payment
+            st.write(f"Loan Amount: ${loan_amount:,.2f}")
+            home_price = None
+            down_payment = None
+        
             interest_rate = st.number_input(
                 "Annual Interest Rate (%)",
                 min_value=0.1,
